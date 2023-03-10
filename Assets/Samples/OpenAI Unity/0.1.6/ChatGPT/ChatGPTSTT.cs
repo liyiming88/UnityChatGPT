@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 namespace OpenAI
 {
@@ -23,27 +24,35 @@ namespace OpenAI
 
         public async void SendReply(string userInput)
         {
-            Instruction += $"{userInput}\nA: ";
-
-            textArea.text = "...";
-
-            // Complete the instruction
-            var completionResponse = await openai.CreateCompletion(new CreateCompletionRequest()
+            try
             {
-                Prompt = Instruction,
-                Model = "text-davinci-003",
-                MaxTokens = 128
-            });
+                Instruction += $"{userInput}\nA: ";
 
-            if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
-            {
-                textArea.text = completionResponse.Choices[0].Text;
-                Instruction += $"{completionResponse.Choices[0].Text}\nQ: ";
+                textArea.text = "...";
+
+                // Complete the instruction
+                var completionResponse = await openai.CreateCompletion(new CreateCompletionRequest()
+                {
+                    Prompt = Instruction,
+                    Model = "text-davinci-003",
+                    MaxTokens = 128
+                });
+
+                if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
+                {
+                    textArea.text = completionResponse.Choices[0].Text;
+                    Instruction += $"{completionResponse.Choices[0].Text}\nQ: ";
+                }
+                else
+                {
+                    Debug.LogWarning("No text was generated from this prompt.");
+                }
             }
-            else
+            catch (Exception e)
             {
-                Debug.LogWarning("No text was generated from this prompt.");
+                Debug.LogError(e);
             }
+
         }
 
         private void Start()
