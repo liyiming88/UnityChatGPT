@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Microsoft.CognitiveServices.Speech;
+using Microsoft.CognitiveServices.Speech.Audio;
 using TMPro;
 
 namespace OpenAI
@@ -38,6 +39,8 @@ namespace OpenAI
         // 开始录音
         public async void Recording()
         {
+            
+            using var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
             await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
             lock (threadLocker)
             {
