@@ -9,3 +9,5 @@
 3. open this project by Unity, go to SpeechToText.cs file, in void Start method, replace your Azure Speech Studio service region and resouce key.
    ```
    config = SpeechConfig.FromSubscription("e512bf00xxxxxxxxxxxxxxxxx", "easxxx");
+4. Scenes:
+   STTScene is combine STT and ChatGPT, ChatGPT sample is just ChatGPT usecase
