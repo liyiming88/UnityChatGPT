@@ -17,7 +17,7 @@ namespace OpenAI
         // PULLED OUT OF BUTTON CLICK
         SpeechRecognizer recognizer;
         SpeechConfig config;
-        SpeechSynthesizer speechSynthesizer;
+        SpeechSynthesizer synthesizer;
         // if the whole message has been transcribed over
         bool isMessageOver = false;
 
@@ -43,13 +43,31 @@ namespace OpenAI
             {
                 speechStarted = true;
             }
-
         }
 
         // 文字转语音
         public async void SynthesizeAudioAsync(string text)
         {
-            await speechSynthesizer.SpeakTextAsync(text);
+            await synthesizer.SpeakTextAsync(text);
+        }
+
+
+        private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
+        {
+            await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
+            lock (threadLocker)
+            {
+                speechStarted = true;
+            }
+        }
+
+        private async void RestartRecord(object sender, SpeechSynthesisEventArgs e)
+        {
+            await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
+            lock (threadLocker)
+            {
+                speechStarted = true;
+            }
         }
 
         void Start()
@@ -59,13 +77,13 @@ namespace OpenAI
             config.SpeechSynthesisLanguage = "en-US";
             config.SpeechSynthesisVoiceName = "en-US-JennyNeural";
             // 新建语音转换器
-            speechSynthesizer = new SpeechSynthesizer(config);
-            // 新建语音识别器
-            recognizer = new SpeechRecognizer(config);
+            synthesizer = new SpeechSynthesizer(config);
+            synthesizer.SynthesisStarted += StopRecord;
+            synthesizer.SynthesisCompleted += RestartRecord; 
+             // 新建语音识别器
+             recognizer = new SpeechRecognizer(config);
             // 订阅事件：当用户语音完整输出后，调用Handler
             recognizer.Recognized += RecognizedHandler;
-            // 程序开始时，录音
-            Recording();
         }
 
         void Update()

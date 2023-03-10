@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
@@ -58,7 +58,8 @@ namespace OpenAI
 
         private void Start()
         {
-
+            // 程序开始时录音
+            SpeechToText.Speechy.Recording();
         }
 
         void Awake()
