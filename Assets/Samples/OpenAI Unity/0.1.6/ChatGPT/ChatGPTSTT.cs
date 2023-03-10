@@ -42,6 +42,7 @@ namespace OpenAI
                 {
                     textArea.text = completionResponse.Choices[0].Text;
                     Instruction += $"{completionResponse.Choices[0].Text}\nQ: ";
+                    SpeechToText.Speechy.SynthesizeAudioAsync(completionResponse.Choices[0].Text);
                 }
                 else
                 {
