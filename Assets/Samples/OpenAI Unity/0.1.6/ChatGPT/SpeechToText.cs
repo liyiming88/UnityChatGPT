@@ -48,12 +48,17 @@ namespace OpenAI
             }
         }
 
+        public async void KillRecord()
+        {
+            await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
+            
+        }
+
         // 文字转语音
         public async void SynthesizeAudioAsync(string text)
         {
             await synthesizer.SpeakTextAsync(text);
         }
-
 
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
         {
@@ -88,7 +93,6 @@ namespace OpenAI
             // 订阅事件：当用户语音完整输出后，调用Handler
             recognizer.Recognized += RecognizedHandler;
             string[] aaa = Microphone.devices;
-            Debug.Log(aaa);
         }
 
         void Update()
@@ -121,6 +125,12 @@ namespace OpenAI
                 speechy = this;
                 DontDestroyOnLoad(gameObject);
             }
+        }
+
+
+        void OnDestroy()
+        {
+            Debug.Log("");
         }
     }
 }

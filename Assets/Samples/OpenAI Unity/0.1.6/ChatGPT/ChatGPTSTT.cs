@@ -19,7 +19,7 @@ namespace OpenAI
         private OpenAIApi openai = new OpenAIApi();
 
         private string userInput;
-        private string Instruction = "Act as a random stranger in a chat room and reply to the questions.\nQ: ";
+        private string Instruction = "You are a Unity programmer.\nQ: ";
 
 
         public async void SendReply(string userInput)
@@ -35,7 +35,9 @@ namespace OpenAI
                 {
                     Prompt = Instruction,
                     Model = "text-davinci-003",
-                    MaxTokens = 128
+                    MaxTokens = 128,
+                    N = 1,
+                    Temperature = 0.2f,
                 });
 
                 if (completionResponse.Choices != null && completionResponse.Choices.Count > 0)
@@ -74,6 +76,11 @@ namespace OpenAI
                 chatty = this;
                 DontDestroyOnLoad(gameObject);
             }
+        }
+
+        void OnDestroy()
+        {
+            SpeechToText.Speechy.KillRecord();
         }
     }
 }
