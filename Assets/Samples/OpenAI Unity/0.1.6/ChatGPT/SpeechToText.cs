@@ -87,6 +87,8 @@ namespace OpenAI
              recognizer = new SpeechRecognizer(config);
             // 订阅事件：当用户语音完整输出后，调用Handler
             recognizer.Recognized += RecognizedHandler;
+            string[] aaa = Microphone.devices;
+            Debug.Log(aaa);
         }
 
         void Update()
