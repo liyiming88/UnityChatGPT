@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using TMPro;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace OpenAI
 {
@@ -36,6 +38,20 @@ namespace OpenAI
             }
         }
 
+        private void StartViseme(object sender, SpeechSynthesisVisemeEventArgs e)
+        {
+            Debug.Log($"Viseme event received. Audio offset: " +
+                    $"{e.AudioOffset / 10000}ms, viseme id: {e.VisemeId}.");
+
+            // `Animation` is an xml string for SVG or a json string for blend shapes
+            if (e.Animation != "") {
+                var animation = e.Animation;
+                string jsonString = "{\"name\":\"John\",\"age\":30}"; 
+                var jsonObject = JsonConvert.DeserializeObject(jsonString); 
+                // todo
+            }
+        }
+
         // 开始录音
         public async void Recording()
         {
@@ -57,7 +73,15 @@ namespace OpenAI
         // 文字转语音
         public async void SynthesizeAudioAsync(string text)
         {
-            await synthesizer.SpeakTextAsync(text);
+            //todo replace "a" to text
+            var content = "a";
+            var ssml = @$"<speak version='1.0' xml:lang='en-US' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts'>
+            <voice name='en-US-JennyNeural'>
+                <mstts:viseme type='FacialExpression'/>
+                {content}
+            </voice>
+        </speak>";
+            await synthesizer.SpeakSsmlAsync(ssml);
         }
 
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
@@ -78,6 +102,7 @@ namespace OpenAI
             }
         }
 
+
         void Start()
         {
             config = SpeechConfig.FromSubscription("e512bf00442d427e9158b0e381563240", "eastus");
@@ -92,6 +117,8 @@ namespace OpenAI
              recognizer = new SpeechRecognizer(config);
             // 订阅事件：当用户语音完整输出后，调用Handler
             recognizer.Recognized += RecognizedHandler;
+            // // 当文字转语音开始调用时，也开始调用该方法，输出口型数据
+            synthesizer.VisemeReceived += StartViseme;
             string[] aaa = Microphone.devices;
         }
 
