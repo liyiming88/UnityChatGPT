@@ -84,7 +84,7 @@ namespace OpenAI
             // 这两项是配置文字转语音的语言和人物
             config.SpeechSynthesisLanguage = "en-US";
             config.SpeechSynthesisVoiceName = "en-US-JennyNeural";
-            // 新建语音转换器
+            // 新建合成语音转换器
             synthesizer = new SpeechSynthesizer(config);
             synthesizer.SynthesisStarted += StopRecord;
             synthesizer.SynthesisCompleted += RestartRecord; 

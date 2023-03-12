@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using Unity.VisualScripting.FullSerializer;
+using UnityEngine;
+namespace MotionverseSDK
+{
+    public static class Utils
+    {
+        /// <summary>
+        /// 获取JSON字符串中指定KEY的值
+        /// </summary>
+        /// <param name="jsonString"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static List<string> GetJsonValues(string jsonString, string key)
+        {
+            string pattern = $"\"{key}\":\"(.*?)\\\"";
+            MatchCollection matches = Regex.Matches(jsonString, pattern, RegexOptions.IgnoreCase);
+            List<string> lst = new();
+            foreach (Match m in matches.Cast<Match>())
+            {
+                lst.Add(m.Groups[1].Value);
+            }
+
+            return lst;
+        }
+        /// <summary>
+        /// 获取JSON字符串中指定KEY的值
+        /// </summary>
+        /// <param name="jsonString"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string GetJsonValue(string jsonString, string key)
+        {
+            string pattern = $"\"{key}\":\"(.*?)\\\"";
+            Match matche = Regex.Match(jsonString, pattern, RegexOptions.IgnoreCase);
+            return matche.Groups[1].Value;
+        }
+
+        public static long ConvertDateTimep(DateTime time)
+        {
+            return ((time.ToUniversalTime().Ticks - new DateTime(1970, 1, 1, 0, 0, 0, 0).Ticks) / 10000000) * 1000;
+        }
+
+
+        public static long GetTimeStampSecond()
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return Convert.ToInt64(ts.TotalMilliseconds);
+        }
+
+        public static string ObjToStr<T>(T value)
+        {
+            var serializer = new fsSerializer();
+            serializer.TrySerialize(value, out fsData serializedData).AssertSuccessWithoutWarnings();
+            var json = Compress(fsJsonPrinter.PrettyJson(serializedData));
+            return json;
+        }
+        public static string Compress(string json)
+        {
+            StringBuilder sb = new();
+            using (StringReader reader = new(json))
+            {
+                int ch = -1;
+                int lastch = -1;
+                bool isQuoteStart = false;
+                while ((ch = reader.Read()) > -1)
+                {
+                    if ((char)lastch != '\\' && (char)ch == '\"')
+                    {
+                        if (!isQuoteStart)
+                        {
+                            isQuoteStart = true;
+                        }
+                        else
+                        {
+                            isQuoteStart = false;
+                        }
+                    }
+                    if (!Char.IsWhiteSpace((char)ch) || isQuoteStart)
+                    {
+                        sb.Append((char)ch);
+                    }
+                    lastch = ch;
+                }
+            }
+            return sb.ToString();
+        }
+        public static T StrToObj<T>(string str) where T : class
+        {
+            var serializer = new fsSerializer();
+            var data = fsJsonParser.Parse(str);
+            object deserialized = null;
+            serializer.TryDeserialize(data, typeof(T), ref deserialized).AssertSuccessWithoutWarnings();
+            return deserialized as T;
+        }
+
+        public static string EncryptWithMD5(string source)
+        {
+            byte[] sor = Encoding.UTF8.GetBytes(source);
+            MD5 md5 = MD5.Create();
+            byte[] result = md5.ComputeHash(sor);
+            StringBuilder strbul = new(40);
+            for (int i = 0; i < result.Length; i++)
+            {
+                strbul.Append(result[i].ToString("x2"));//加密结果"x2"结果为32位,"x3"结果为48位,"x4"结果为64位
+
+            }
+            return strbul.ToString();
+        }
+
+        /// <summary>
+        /// SHA1 加密，返回大写字符串
+        /// </summary>
+        /// <param name="content">需要加密字符串</param>
+        /// <returns>返回40位UTF8 大写</returns>
+        public static string SHA1(string content)
+        {
+            return SHA1(content, Encoding.UTF8);
+        }
+        /// <summary>
+        /// SHA1 加密，返回大写字符串
+        /// </summary>
+        /// <param name="content">需要加密字符串</param>
+        /// <param name="encode">指定加密编码</param>
+        /// <returns>返回40位小写字符串</returns>
+        public static string SHA1(string content, Encoding encode)
+        {
+            try
+            {
+                SHA1 sha1 = new SHA1CryptoServiceProvider();
+                byte[] bytes_in = encode.GetBytes(content);
+                byte[] bytes_out = sha1.ComputeHash(bytes_in);
+                sha1.Dispose();
+                string result = BitConverter.ToString(bytes_out);
+                result = result.Replace("-", "");
+                return result.ToLower();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("SHA1加密出错：" + ex.Message);
+            }
+        }
+
+        public static Transform FindChildRecursively(Transform parent, string name)
+        {
+            Transform t = parent.Find(name);
+            if (t == null)
+            {
+                foreach (Transform tran in parent)
+                {
+                    t = FindChildRecursively(tran, name);
+                    if (t != null)
+                    {
+                        return t;
+                    }
+                }
+            }
+
+            return t;
+        }
+    }
+}
