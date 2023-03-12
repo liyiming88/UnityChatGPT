@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
-namespace MotionverseSDK
+namespace OpenAI
 {
     public static class Utils
     {

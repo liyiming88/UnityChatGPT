@@ -9,10 +9,10 @@ using UnityEngine;
 using MotionverseSDK.Core;
 using Unity.VisualScripting;
 
-namespace MotionverseSDK
+namespace OpenAI
 {
     [RequireComponent(typeof(AudioSource))]
-    public class AvatarManager : Core.Singleton<AvatarManager>
+    public class AvatarManager : Singleton<AvatarManager>
     {
         private SkinnedMeshRenderer skinnedMeshRenderer;
         private Mesh skinnedMesh;

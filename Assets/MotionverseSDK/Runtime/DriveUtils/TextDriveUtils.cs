@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace MotionverseSDK
+namespace OpenAI
 {
     public class TextDriveUtils
     {

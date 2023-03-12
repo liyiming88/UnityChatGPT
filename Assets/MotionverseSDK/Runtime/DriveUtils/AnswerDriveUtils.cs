@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using MotionverseSDK.Core;
-namespace MotionverseSDK
+namespace OpenAI
 {
     public class AnswerDriveUtils
     {

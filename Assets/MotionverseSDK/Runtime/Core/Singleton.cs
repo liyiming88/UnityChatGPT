@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace MotionverseSDK.Core
+namespace OpenAI
 {
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {

@@ -1,6 +1,6 @@
 using System.Collections;
 using MotionverseSDK.Core;
-namespace MotionverseSDK
+namespace OpenAI
 {
     public class TaskManager : Singleton<TaskManager>
     {
