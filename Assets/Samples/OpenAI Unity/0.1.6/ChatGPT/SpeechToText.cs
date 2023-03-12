@@ -5,6 +5,7 @@ using Microsoft.CognitiveServices.Speech.Audio;
 using TMPro;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace OpenAI
 {
@@ -40,15 +41,16 @@ namespace OpenAI
 
         private void StartViseme(object sender, SpeechSynthesisVisemeEventArgs e)
         {
-            Debug.Log($"Viseme event received. Audio offset: " +
-                    $"{e.AudioOffset / 10000}ms, viseme id: {e.VisemeId}.");
-
+            /*            Debug.Log($"Viseme event received. Audio offset: " +
+                                $"{e.AudioOffset / 10000}ms, viseme id: {e.VisemeId}.");*/
             // `Animation` is an xml string for SVG or a json string for blend shapes
-            if (e.Animation != "") {
+            if (e.Animation != "")
+            {
                 var animation = e.Animation;
-                string jsonString = "{\"name\":\"John\",\"age\":30}"; 
-                var jsonObject = JsonConvert.DeserializeObject(jsonString); 
-                // todo
+                JObject jsonObject = (JObject)JsonConvert.DeserializeObject(animation);
+                string bs_str = JsonConvert.SerializeObject(jsonObject["BlendShapes"]);
+                JArray br_arr = JArray.Parse(bs_str);
+                AvatarManagerSTT.Manager.SetBlendShape(bs_str);
             }
         }
 
@@ -74,14 +76,15 @@ namespace OpenAI
         public async void SynthesizeAudioAsync(string text)
         {
             //todo replace "a" to text
-            var content = "a";
+            var content = text;
             var ssml = @$"<speak version='1.0' xml:lang='en-US' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts'>
             <voice name='en-US-JennyNeural'>
                 <mstts:viseme type='FacialExpression'/>
                 {content}
             </voice>
         </speak>";
-            await synthesizer.SpeakSsmlAsync(ssml);
+            var result = await synthesizer.SpeakSsmlAsync(ssml);
+            Debug.Log(result.AudioDuration);
         }
 
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
