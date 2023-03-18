@@ -19,7 +19,7 @@ namespace OpenAI
         private OpenAIApi openai = new OpenAIApi();
 
         private string userInput;
-        private string Instruction = "You are a Unity programmer.\nQ: ";
+        private string Instruction = "Your name is Patrick, I'm a Unity programmer.\nQ: ";
 
 
         public async void SendReply(string userInput)

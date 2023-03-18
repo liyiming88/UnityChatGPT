@@ -140,17 +140,22 @@ namespace OpenAI
 
         public void LateUpdate()
         {
-            if (audioSource.clip != null && audioSource.time > 0)
+            /* if (audioSource.clip != null && audioSource.time > 0)
+             {
+                 isPlaying = true;
+                 PlayMotion(audioSource.time);
+                 PlayBS(4);
+             }
+             else if (audioSource.clip != null && isPlaying)
+             {
+                 audioSource.clip = null;
+                 isPlaying = false;
+                 StartCoroutine(BodyAnimEnd());
+             }*/
+            if (!isPlaying)
             {
                 isPlaying = true;
-                PlayMotion(audioSource.time);
                 PlayBS(4);
-            }
-            else if (audioSource.clip != null && isPlaying)
-            {
-                audioSource.clip = null;
-                isPlaying = false;
-                StartCoroutine(BodyAnimEnd());
             }
 
 

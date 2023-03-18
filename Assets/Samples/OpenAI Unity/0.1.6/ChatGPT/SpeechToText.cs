@@ -28,7 +28,10 @@ namespace OpenAI
         private object threadLocker = new object();
         private bool speechStarted = false; //checking to see if you've started listening for speech
         private string message;
-        
+
+        private bool once = true;
+        private JArray bsArray = new JArray();
+
         // 用来识别整句输出，并且输出完整文本
         private void RecognizedHandler(object sender, SpeechRecognitionEventArgs e)
         {
@@ -39,6 +42,7 @@ namespace OpenAI
             }
         }
 
+        
         private void StartViseme(object sender, SpeechSynthesisVisemeEventArgs e)
         {
             /*            Debug.Log($"Viseme event received. Audio offset: " +
@@ -50,7 +54,10 @@ namespace OpenAI
                 JObject jsonObject = (JObject)JsonConvert.DeserializeObject(animation);
                 string bs_str = JsonConvert.SerializeObject(jsonObject["BlendShapes"]);
                 JArray br_arr = JArray.Parse(bs_str);
-                AvatarManagerSTT.Manager.SetBlendShape(bs_str);
+                foreach (var item in br_arr)
+                {
+                    bsArray.Add(item);
+                }
             }
         }
 
@@ -83,9 +90,25 @@ namespace OpenAI
                 {content}
             </voice>
         </speak>";
-            var result = await synthesizer.SpeakSsmlAsync(ssml);
-            Debug.Log(result.AudioDuration);
+            await synthesizer.SpeakSsmlAsync(ssml);
+            AvatarManager.Instance.startPlayViseme = true;
+            AvatarManager.Instance.SetBlendShape(bsArray);
         }
+
+       /* public delegate void CallbackDelegat(string message);
+        public void DoSomething(CallbackDelegat callback)
+        {
+            // Do something
+            string result = "Done!"; 
+            callback(result);
+        }
+        public void Main()
+        {
+            CallbackDelegat callback = new CallbackDelegat(MyCallback);
+            DoSomething(callback);
+        }
+        public void MyCallback(string message) { Debug.Log(message); }*/
+
 
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
         {
@@ -103,6 +126,8 @@ namespace OpenAI
             {
                 speechStarted = true;
             }
+            
+
         }
 
 
