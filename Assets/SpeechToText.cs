@@ -91,8 +91,6 @@ namespace OpenAI
             </voice>
         </speak>";
             await synthesizer.SpeakSsmlAsync(ssml);
-            AvatarManager.Instance.startPlayViseme = true;
-            AvatarManager.Instance.SetBlendShape(bsArray);
         }
 
        /* public delegate void CallbackDelegat(string message);
