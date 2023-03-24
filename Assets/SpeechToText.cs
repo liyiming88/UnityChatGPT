@@ -43,22 +43,15 @@ namespace OpenAI
         }
 
         
+        // 当文字转语音开始时，开始记录口型与表情
         private void StartViseme(object sender, SpeechSynthesisVisemeEventArgs e)
         {
-            /*            Debug.Log($"Viseme event received. Audio offset: " +
-                                $"{e.AudioOffset / 10000}ms, viseme id: {e.VisemeId}.");*/
-            // `Animation` is an xml string for SVG or a json string for blend shapes
-            if (e.Animation != "")
-            {
-                var animation = e.Animation;
-                JObject jsonObject = (JObject)JsonConvert.DeserializeObject(animation);
-                string bs_str = JsonConvert.SerializeObject(jsonObject["BlendShapes"]);
-                JArray br_arr = JArray.Parse(bs_str);
-                foreach (var item in br_arr)
-                {
-                    bsArray.Add(item);
-                }
-            }
+            // to do, 这里参考azure viseme文档
+            // https://learn.microsoft.com/zh-cn/azure/cognitive-services/speech-service/how-to-speech-synthesis-viseme?pivots=programming-language-csharp&tabs=3dblendshapes
+            // ，收集口型和表情
+
+
+
         }
 
         // 开始录音
@@ -82,31 +75,14 @@ namespace OpenAI
         // 文字转语音
         public async void SynthesizeAudioAsync(string text)
         {
-            //todo replace "a" to text
-            var content = text;
             var ssml = @$"<speak version='1.0' xml:lang='en-US' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts'>
             <voice name='en-US-JennyNeural'>
                 <mstts:viseme type='FacialExpression'/>
-                {content}
+                {text}
             </voice>
         </speak>";
             await synthesizer.SpeakSsmlAsync(ssml);
         }
-
-       /* public delegate void CallbackDelegat(string message);
-        public void DoSomething(CallbackDelegat callback)
-        {
-            // Do something
-            string result = "Done!"; 
-            callback(result);
-        }
-        public void Main()
-        {
-            CallbackDelegat callback = new CallbackDelegat(MyCallback);
-            DoSomething(callback);
-        }
-        public void MyCallback(string message) { Debug.Log(message); }*/
-
 
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
         {
@@ -131,6 +107,7 @@ namespace OpenAI
 
         void Start()
         {
+            // 认证Azure speech sdk的权限
             config = SpeechConfig.FromSubscription("e512bf00442d427e9158b0e381563240", "eastus");
             // 这两项是配置文字转语音的语言和人物
             config.SpeechSynthesisLanguage = "en-US";
@@ -162,7 +139,7 @@ namespace OpenAI
             if (isMessageOver)
             {
                 isMessageOver = false;
-                ChatGPTSTT.Chatty.SendReply(message);
+                ChatGPTSTT.Chatty.CallChatGPT(message);
             }
         }
 

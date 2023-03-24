@@ -22,7 +22,7 @@ namespace OpenAI
         private string Instruction = "Your name is Patrick, I'm a Unity programmer.\nQ: ";
 
 
-        public async void SendReply(string userInput)
+        public async void CallChatGPT(string userInput)
         {
             try
             {
