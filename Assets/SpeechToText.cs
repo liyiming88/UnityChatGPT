@@ -13,6 +13,7 @@ namespace OpenAI
     {
         private static SpeechToText speechy;
 
+        private Animator animator;
         public static SpeechToText Speechy
         {
             get { return speechy; }
@@ -28,7 +29,8 @@ namespace OpenAI
         private object threadLocker = new object();
         private bool speechStarted = false; //checking to see if you've started listening for speech
         private string message;
-
+        private bool ifAvatarTalking;
+        private bool ifAvatarListening;
         private bool once = true;
         private JArray bsArray = new JArray();
 
@@ -84,21 +86,27 @@ namespace OpenAI
             await synthesizer.SpeakSsmlAsync(ssml);
         }
 
+        // avatar is talking
         private async void StopRecord(object sender, SpeechSynthesisEventArgs e)
         {
             await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
             lock (threadLocker)
             {
                 speechStarted = true;
+                ifAvatarTalking = true;
+                ifAvatarListening = false;
             }
         }
 
+        // player is talking
         private async void RestartRecord(object sender, SpeechSynthesisEventArgs e)
         {
             await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
             lock (threadLocker)
             {
                 speechStarted = true;
+                ifAvatarTalking = false;
+                ifAvatarListening = true;
             }
             
 
@@ -123,9 +131,11 @@ namespace OpenAI
             // // 当文字转语音开始调用时，也开始调用该方法，输出口型数据
             synthesizer.VisemeReceived += StartViseme;
             string[] aaa = Microphone.devices;
+            animator = gameObject.GetComponent<Animator>();
+
         }
 
-        void Update()
+    void Update()
         {
 
             lock (threadLocker)
@@ -140,6 +150,19 @@ namespace OpenAI
             {
                 isMessageOver = false;
                 ChatGPTSTT.Chatty.CallChatGPT(message);
+            }
+
+            if (ifAvatarTalking)
+            {
+                animator.SetTrigger("talk");
+                ifAvatarTalking = false;
+
+            }
+            if (ifAvatarListening)
+            {
+                animator.SetTrigger("listen");
+                ifAvatarListening = false;
+
             }
         }
 
