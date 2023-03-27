@@ -31,8 +31,6 @@ namespace OpenAI
         private string message;
         private bool ifAvatarTalking;
         private bool ifAvatarListening;
-        private bool once = true;
-        private JArray bsArray = new JArray();
 
         // 用来识别整句输出，并且输出完整文本
         private void RecognizedHandler(object sender, SpeechRecognitionEventArgs e)
@@ -51,15 +49,11 @@ namespace OpenAI
             // to do, 这里参考azure viseme文档
             // https://learn.microsoft.com/zh-cn/azure/cognitive-services/speech-service/how-to-speech-synthesis-viseme?pivots=programming-language-csharp&tabs=3dblendshapes
             // ，收集口型和表情
-
-
-
         }
 
         // 开始录音
         public async void Recording()
         {
-            
             using var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
             await recognizer.StartContinuousRecognitionAsync().ConfigureAwait(false); // this will start the listening when you click the button, if it's already off
             lock (threadLocker)
@@ -71,19 +65,12 @@ namespace OpenAI
         public async void KillRecord()
         {
             await recognizer.StopContinuousRecognitionAsync().ConfigureAwait(false);
-            
         }
 
         // 文字转语音
         public async void SynthesizeAudioAsync(string text)
         {
-            var ssml = @$"<speak version='1.0' xml:lang='en-US' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts'>
-            <voice name='en-US-JennyNeural'>
-                <mstts:viseme type='FacialExpression'/>
-                {text}
-            </voice>
-        </speak>";
-            await synthesizer.SpeakSsmlAsync(ssml);
+            await synthesizer.SpeakTextAsync(text);
         }
 
         // avatar is talking
@@ -108,8 +95,6 @@ namespace OpenAI
                 ifAvatarTalking = false;
                 ifAvatarListening = true;
             }
-            
-
         }
 
 
